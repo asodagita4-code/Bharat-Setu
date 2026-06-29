@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bharat Setu - Pro Learning Platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+    display:flex;
+    height:100vh;
+    background:#f5f7ff;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:#0b1220;
+    color:white;
+    padding:20px;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    color:#60a5fa;
+    margin-bottom:20px;
+}
+
+.menu button{
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    background:#111a2e;
+    border:none;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    text-align:left;
+}
+
+.menu button:hover{
+    background:#1f2a44;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:20px;
+    overflow:auto;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    margin:10px 0;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+h2{margin-bottom:10px;}
+
+.btn{
+    padding:10px 14px;
+    border:none;
+    background:#2563eb;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.btn:hover{background:#1d4ed8;}
+
+input{
+    padding:10px;
+    width:70%;
+    margin-top:10px;
+}
+
+/* QUIZ */
+.option{
+    display:block;
+    padding:10px;
+    margin:6px 0;
+    background:#eef2ff;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.option:hover{background:#dbeafe;}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    background:#dcfce7;
+    color:#166534;
+    border-radius:6px;
+    font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="logo">🇮🇳 Bharat Setu</div>
+
+    <div class="menu">
+        <button onclick="show('home')">🏠 Dashboard</button>
+        <button onclick="show('courses')">📚 Courses</button>
+        <button onclick="show('lesson')">📖 Lesson</button>
+        <button onclick="show('quiz')">🧠 Quiz</button>
+    </div>
+</div>
+
+<div class="main">
+
+<!-- HOME -->
+<div id="home">
+    <h2>Dashboard</h2>
+    <div class="card">
+        Welcome to <b>Bharat Setu</b> 🚀<br><br>
+        Your progress is saved automatically.
+        <br><br>
+        <span class="badge">Pro Learning System Active</span>
+    </div>
+
+    <div class="card">
+        📊 Progress: <span id="progress">0%</span>
+    </div>
+</div>
+
+<!-- COURSES -->
+<div id="courses" style="display:none;">
+    <h2>Courses</h2>
+
+    <div class="card">
+        <h3>Class 6 - Mathematics</h3>
+        <button class="btn" onclick="openLesson(0)">Start Chapter 1</button>
+    </div>
+
+    <div class="card">
+        <h3>Class 8 - Science</h3>
+        <button class="btn" onclick="openLesson(1)">Start Chapter 1</button>
+    </div>
+</div>
+
+<!-- LESSON -->
+<div id="lesson" style="display:none;">
+    <h2 id="lessonTitle">Lesson</h2>
+
+    <div class="card" id="lessonContent"></div>
+
+    <button class="btn" onclick="markComplete()">Mark as Complete</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" style="display:none;">
+    <h2>Quiz System</h2>
+
+    <div class="card">
+        <p id="qText"></p>
+        <div id="options"></div>
+        <p id="result"></p>
+    </div>
+</div>
+
+</div>
+
+<script>
+
+/* REAL COURSE DATA (like Khan Academy structure) */
+const courses = [
+{
+    title:"Math Class 6",
+    lesson:"Numbers are the foundation of mathematics. Learn addition, subtraction and multiplication.",
+    quiz:{
+        q:"What is 12 + 8?",
+        options:[18,20,22,24],
+        answer:20
+    }
+},
+{
+    title:"Science Class 8",
+    lesson:"Science helps us understand nature through observation and experiments.",
+    quiz:{
+        q:"Which is a natural source of light?",
+        options:["Bulb","Sun","Torch","LED"],
+        answer:"Sun"
+    }
+}
+];
+
+let currentIndex = 0;
+
+/* NAVIGATION */
+function show(id){
+    document.querySelectorAll('.main > div').forEach(d=>d.style.display='none');
+    document.getElementById(id).style.display='block';
+
+    if(id==='home') loadProgress();
+    if(id==='quiz') loadQuiz();
+}
+
+/* LESSON SYSTEM */
+function openLesson(i){
+    currentIndex = i;
+    show('lesson');
+
+    document.getElementById('lessonTitle').innerText = courses[i].title;
+    document.getElementById('lessonContent').innerText = courses[i].lesson;
+}
+
+/* MARK COMPLETE */
+function markComplete(){
+    let progress = localStorage.getItem("progress") || 0;
+    progress = parseInt(progress) + 50;
+    localStorage.setItem("progress", progress);
+    alert("Lesson Completed ✅");
+    loadProgress();
+}
+
+/* PROGRESS */
+function loadProgress(){
+    document.getElementById("progress").innerText =
+        (localStorage.getItem("progress") || 0) + "%";
+}
+
+/* QUIZ ENGINE */
+function loadQuiz(){
+    let q = courses[currentIndex].quiz;
+
+    document.getElementById("qText").innerText = q.q;
+
+    let optDiv = document.getElementById("options");
+    optDiv.innerHTML = "";
+
+    q.options.forEach(opt=>{
+        let div = document.createElement("div");
+        div.className = "option";
+        div.innerText = opt;
+
+        div.onclick = ()=>{
+            if(opt === q.answer){
+                document.getElementById("result").innerText = "✅ Correct!";
+                let p = parseInt(localStorage.getItem("progress")||0)+50;
+                localStorage.setItem("progress",p);
+                loadProgress();
+            } else {
+                document.getElementById("result").innerText = "❌ Wrong Answer";
+            }
+        };
+
+        optDiv.appendChild(div);
+    });
+}
+
+/* INIT */
+loadProgress();
+
+</script>
+
+</body>
+</html>
